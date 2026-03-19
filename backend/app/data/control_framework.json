@@ -1,0 +1,91 @@
+{
+  "version": "1.0",
+  "frameworks": ["NIS2", "IEC-62443", "ISO-27001"],
+  "domains": [
+    {
+      "id": "GOV",
+      "name": "Governance",
+      "applicable": ["IT", "OT", "HYBRID"],
+      "controls": [
+        {"id": "GOV-01", "name": "Information Security Policy", "nis2": "Art.21(2)(a)", "iso27001": "A.5.1", "iec62443": "SR 2.1"},
+        {"id": "GOV-02", "name": "Security Roles & Responsibilities", "nis2": "Art.21(2)(b)", "iso27001": "A.6.1", "iec62443": "SR 2.1"},
+        {"id": "GOV-03", "name": "Supplier Risk Management Policy", "nis2": "Art.21(2)(d)", "iso27001": "A.15.1", "iec62443": "SR 2.1"}
+      ]
+    },
+    {
+      "id": "ACC",
+      "name": "Access Control",
+      "applicable": ["IT", "OT", "HYBRID"],
+      "controls": [
+        {"id": "ACC-01", "name": "Privileged Access Management", "nis2": "Art.21(2)(i)", "iso27001": "A.9.2", "iec62443": "SR 1.1"},
+        {"id": "ACC-02", "name": "Multi-Factor Authentication", "nis2": "Art.21(2)(j)", "iso27001": "A.9.4", "iec62443": "SR 1.1"},
+        {"id": "ACC-03", "name": "Access Review & Revocation", "nis2": "Art.21(2)(i)", "iso27001": "A.9.2", "iec62443": "SR 1.3"}
+      ]
+    },
+    {
+      "id": "VULN",
+      "name": "Vulnerability Management",
+      "applicable": ["IT", "OT", "HYBRID"],
+      "controls": [
+        {"id": "VULN-01", "name": "Vulnerability Scanning", "nis2": "Art.21(2)(e)", "iso27001": "A.12.6", "iec62443": "SR 3.3"},
+        {"id": "VULN-02", "name": "Patch Management", "nis2": "Art.21(2)(e)", "iso27001": "A.12.6", "iec62443": "SR 3.3"},
+        {"id": "VULN-03", "name": "Penetration Testing", "nis2": "Art.21(2)(e)", "iso27001": "A.14.2", "iec62443": "SR 3.3"}
+      ]
+    },
+    {
+      "id": "INC",
+      "name": "Incident Response",
+      "applicable": ["IT", "OT", "HYBRID"],
+      "controls": [
+        {"id": "INC-01", "name": "Incident Response Plan", "nis2": "Art.21(2)(c)", "iso27001": "A.16.1", "iec62443": "SR 6.1"},
+        {"id": "INC-02", "name": "Incident Notification SLA", "nis2": "Art.23", "iso27001": "A.16.1", "iec62443": "SR 6.2"},
+        {"id": "INC-03", "name": "Incident Logging & Forensics", "nis2": "Art.21(2)(c)", "iso27001": "A.16.1", "iec62443": "SR 6.1"}
+      ]
+    },
+    {
+      "id": "BC",
+      "name": "Business Continuity",
+      "applicable": ["IT", "OT", "HYBRID"],
+      "controls": [
+        {"id": "BC-01", "name": "BCP / DR Plan", "nis2": "Art.21(2)(c)", "iso27001": "A.17.1", "iec62443": "SR 7.1"},
+        {"id": "BC-02", "name": "RTO / RPO Definitions", "nis2": "Art.21(2)(c)", "iso27001": "A.17.1", "iec62443": "SR 7.2"},
+        {"id": "BC-03", "name": "DR Testing", "nis2": "Art.21(2)(c)", "iso27001": "A.17.1", "iec62443": "SR 7.1"}
+      ]
+    },
+    {
+      "id": "OT-SEC",
+      "name": "OT Security",
+      "applicable": ["OT", "HYBRID"],
+      "controls": [
+        {"id": "OT-01", "name": "Remote Access to OT/SCADA", "nis2": "Art.21(2)(i)", "iso27001": "A.9.4", "iec62443": "SR 1.1"},
+        {"id": "OT-02", "name": "IT/OT Network Segmentation", "nis2": "Art.21(2)(h)", "iso27001": "A.13.1", "iec62443": "SR 5.1"},
+        {"id": "OT-03", "name": "OT Patch Management", "nis2": "Art.21(2)(e)", "iso27001": "A.12.6", "iec62443": "SR 3.3"},
+        {"id": "OT-04", "name": "OT Network Monitoring", "nis2": "Art.21(2)(e)", "iso27001": "A.12.4", "iec62443": "SR 6.1"},
+        {"id": "OT-05", "name": "Safety Impact Assessment", "nis2": "Art.21(2)(a)", "iso27001": "A.14.1", "iec62443": "SR 2.1"},
+        {"id": "OT-06", "name": "Maintenance Controls", "nis2": "Art.21(2)(d)", "iso27001": "A.11.2", "iec62443": "SR 2.1"}
+      ]
+    },
+    {
+      "id": "TPM",
+      "name": "Third Party Management",
+      "applicable": ["IT", "OT", "HYBRID"],
+      "controls": [
+        {"id": "TPM-01", "name": "Sub-supplier Assessment", "nis2": "Art.21(2)(d)", "iso27001": "A.15.2", "iec62443": "SR 2.1"},
+        {"id": "TPM-02", "name": "Contractual Security Requirements", "nis2": "Art.21(2)(d)", "iso27001": "A.15.1", "iec62443": "SR 2.1"},
+        {"id": "TPM-03", "name": "Security Certifications", "nis2": "Art.21(2)(d)", "iso27001": "A.15.1", "iec62443": "SR 2.1"}
+      ]
+    }
+  ],
+  "risk_thresholds": {
+    "LOW":      {"max": 25, "reassessment_days": 365, "color": "#39e75f"},
+    "MEDIUM":   {"max": 50, "reassessment_days": 180, "color": "#ffd60a"},
+    "HIGH":     {"max": 75, "reassessment_days": 90,  "color": "#ff6b35"},
+    "CRITICAL": {"max": 100,"reassessment_days": 30,  "color": "#ff2d55"}
+  },
+  "compensating_controls": {
+    "ACC-01": "Implement enhanced monitoring and session recording as compensating control for PAM",
+    "OT-01":  "Implement supervised access with on-site escort as compensating control for secure remote access",
+    "OT-02":  "Implement strict firewall rules and traffic monitoring as compensating control for full segmentation",
+    "VULN-01":"Implement manual review process and vendor advisories monitoring as compensating control for scanning"
+  }
+}

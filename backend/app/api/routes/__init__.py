@@ -1,0 +1,1 @@
+from app.api.routes import suppliers, assessments, scoring, recommendations, dashboard
