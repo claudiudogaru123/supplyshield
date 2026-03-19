@@ -1,4 +1,4 @@
-﻿backend/venv/
+backend/venv/
 backend/__pycache__/
 backend/**/__pycache__/
 backend/*.db
@@ -7,6 +7,3 @@ frontend/node_modules/
 frontend/dist/
 .DS_Store
 Thumbs.db
-node_modules/
-package-lock.json
-package.json

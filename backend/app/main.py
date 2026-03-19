@@ -9,6 +9,8 @@ from app.api.routes import suppliers, assessments, scoring, recommendations, das
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await init_db()
+    from app.seed import seed
+    await seed()
     yield
 
 
