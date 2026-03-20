@@ -1,17 +1,19 @@
 import { useAuthStore } from '../../store/authStore'
 import { useNotificationStore } from '../../store/notificationStore'
-import { Bell, User, LogOut, Settings } from 'lucide-react'
+import { Bell, User, LogOut, Settings, ChevronRight } from 'lucide-react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
-const PAGE_TITLES: Record<string, string> = {
-  '/dashboard': 'Risk Dashboard',
-  '/suppliers': 'Supplier Registry',
-  '/reports': 'Reports & Analytics',
-  '/notifications': 'Notifications',
-  '/audit-log': 'Audit Log',
-  '/profile': 'Profile & Settings',
-  '/erp-integration': 'ERP Integration',
+const PAGE_TITLES: Record<string, { title: string; subtitle?: string }> = {
+  '/dashboard':      { title: 'Dashboard',         subtitle: 'Risk overview & KPIs' },
+  '/suppliers':      { title: 'Suppliers',          subtitle: 'Supplier registry' },
+  '/reports':        { title: 'Reports',            subtitle: 'Analytics & exports' },
+  '/notifications':  { title: 'Alerts',             subtitle: 'Notifications center' },
+  '/audit-log':      { title: 'Audit Log',          subtitle: 'Activity history' },
+  '/profile':        { title: 'Profile',            subtitle: 'Settings & preferences' },
+  '/erp-integration':{ title: 'ERP Integration',   subtitle: 'System connections' },
+  '/kpi':            { title: 'KPI Tracking',       subtitle: 'Performance indicators' },
+  '/onboarding':     { title: 'Onboarding',         subtitle: 'Supplier onboarding' },
 }
 
 export default function TopBar() {
@@ -20,90 +22,205 @@ export default function TopBar() {
   const navigate = useNavigate()
   const location = useLocation()
   const [showUserMenu, setShowUserMenu] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
 
-  const title = PAGE_TITLES[location.pathname] ||
-    (location.pathname.startsWith('/assessment') ? 'Security Assessment' :
-     location.pathname.startsWith('/suppliers/') ? 'Supplier Detail' : 'SUPPLYSHIELD')
+  // Close menu on outside click
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setShowUserMenu(false)
+      }
+    }
+    if (showUserMenu) document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [showUserMenu])
+
+  const pageInfo = PAGE_TITLES[location.pathname] ?? (
+    location.pathname.startsWith('/assessment') ? { title: 'Assessment',      subtitle: 'Security evaluation' } :
+    location.pathname.startsWith('/suppliers/')  ? { title: 'Supplier Detail', subtitle: 'Supplier profile'    } :
+    { title: 'SupplyShield', subtitle: '' }
+  )
+
+  const today = new Date().toLocaleDateString('ro-RO', {
+    weekday: 'long', day: '2-digit', month: 'long', year: 'numeric'
+  })
 
   return (
-    <div className="flex items-center justify-between px-6 py-3 flex-shrink-0"
-      style={{ borderBottom: '1px solid rgba(57,231,95,0.08)', background: 'rgba(4,13,24,0.95)', backdropFilter: 'blur(10px)', minHeight: '56px' }}>
+    <header style={{
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      padding: '0 1.5rem',
+      minHeight: 52,
+      flexShrink: 0,
+      background: 'rgba(245,245,247,0.85)',
+      borderBottom: '1px solid var(--border)',
+      backdropFilter: 'blur(20px) saturate(180%)',
+      WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+      position: 'sticky', top: 0, zIndex: 20,
+      gap: '1rem',
+    }}>
 
-      {/* Page title */}
-      <div>
-        <div style={{ fontFamily: 'Rajdhani', fontWeight: 700, fontSize: '1rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'white' }}>
-          {title}
-        </div>
-        <div style={{ fontFamily: 'JetBrains Mono', fontSize: '0.6rem', color: '#1e3a5f', letterSpacing: '0.05em' }}>
-          {new Date().toLocaleDateString('ro-RO', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' })}
-        </div>
+      {/* ── Left: breadcrumb + title ── */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+        <span style={{ fontSize: '0.78rem', fontWeight: 500, color: 'var(--text-ghost)', whiteSpace: 'nowrap' }}>
+          SupplyShield
+        </span>
+        <ChevronRight style={{ width: 12, height: 12, color: 'var(--text-ghost)', flexShrink: 0 }} />
+        <span style={{
+          fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)',
+          letterSpacing: '-0.01em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+        }}>
+          {pageInfo.title}
+        </span>
+        {/* Date — hidden on small screens */}
+        <span style={{
+          fontSize: '0.72rem', color: 'var(--text-ghost)', fontWeight: 400,
+          marginLeft: 4, whiteSpace: 'nowrap',
+        }} className="hide-mobile">
+          · {today}
+        </span>
       </div>
 
-      {/* Right actions */}
-      <div className="flex items-center gap-2">
-        {/* Notifications */}
-        <button onClick={() => navigate('/notifications')}
-          className="relative p-2 rounded-lg transition-all"
-          style={{ background: 'transparent', border: '1px solid transparent', cursor: 'pointer', color: '#475569' }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(57,231,95,0.08)'; (e.currentTarget as HTMLElement).style.color = '#39e75f' }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; (e.currentTarget as HTMLElement).style.color = '#475569' }}>
-          <Bell className="w-4 h-4" />
+      {/* ── Right: actions ── */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+
+        {/* Bell */}
+        <button
+          onClick={() => navigate('/notifications')}
+          style={{
+            position: 'relative', width: 34, height: 34, borderRadius: 10,
+            background: 'transparent', border: '1px solid transparent',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer', transition: 'all 0.15s ease',
+            color: 'var(--text-muted)',
+          }}
+          onMouseEnter={e => {
+            const el = e.currentTarget as HTMLElement
+            el.style.background = 'var(--surface)'; el.style.borderColor = 'var(--border)'
+          }}
+          onMouseLeave={e => {
+            const el = e.currentTarget as HTMLElement
+            el.style.background = 'transparent'; el.style.borderColor = 'transparent'
+          }}
+        >
+          <Bell style={{ width: 16, height: 16 }} />
           {unreadCount > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center text-black font-bold"
-              style={{ background: '#ff2d55', fontSize: '0.55rem', fontFamily: 'Rajdhani' }}>
-              {unreadCount}
+            <span style={{
+              position: 'absolute', top: 3, right: 3,
+              minWidth: 14, height: 14, borderRadius: 7,
+              background: 'var(--red)', color: 'white',
+              fontSize: '0.55rem', fontWeight: 700,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: '0 3px',
+              border: '1.5px solid var(--bg-primary)',
+            }}>
+              {unreadCount > 9 ? '9+' : unreadCount}
             </span>
           )}
         </button>
 
-        {/* User menu */}
-        <div className="relative">
-          <button onClick={() => setShowUserMenu(v => !v)}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all"
-            style={{ background: showUserMenu ? 'rgba(57,231,95,0.1)' : 'transparent', border: '1px solid', borderColor: showUserMenu ? 'rgba(57,231,95,0.2)' : 'transparent', cursor: 'pointer' }}>
-            <div className="w-6 h-6 rounded-full flex items-center justify-center"
-              style={{ background: 'linear-gradient(135deg, #2abc4a, #39e75f)' }}>
-              <span style={{ fontFamily: 'Rajdhani', fontWeight: 700, fontSize: '0.65rem', color: 'black' }}>
-                {user?.name?.charAt(0) || 'U'}
+        {/* User avatar + dropdown */}
+        <div style={{ position: 'relative' }} ref={menuRef}>
+          <button
+            onClick={() => setShowUserMenu(v => !v)}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 8,
+              padding: '5px 10px 5px 5px',
+              borderRadius: 20,
+              background: showUserMenu ? 'var(--surface-hover)' : 'var(--surface)',
+              border: `1px solid ${showUserMenu ? 'var(--border-hover)' : 'var(--border)'}`,
+              cursor: 'pointer', transition: 'all 0.15s ease',
+            }}
+          >
+            {/* Avatar */}
+            <div style={{
+              width: 26, height: 26, borderRadius: '50%',
+              background: 'var(--blue)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexShrink: 0,
+            }}>
+              <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'white' }}>
+                {user?.name?.charAt(0)?.toUpperCase() || 'U'}
               </span>
             </div>
-            <div className="hidden sm:block text-left">
-              <div style={{ fontFamily: 'Rajdhani', fontWeight: 600, fontSize: '0.75rem', color: '#e2e8f0', letterSpacing: '0.03em' }}>
-                {user?.name || 'User'}
-              </div>
-              <div style={{ fontFamily: 'JetBrains Mono', fontSize: '0.55rem', color: '#334155', textTransform: 'uppercase' }}>
-                {user?.role || 'viewer'}
-              </div>
-            </div>
+            {/* Name — hidden on mobile */}
+            <span style={{
+              fontSize: '0.82rem', fontWeight: 600,
+              color: 'var(--text-primary)', letterSpacing: '-0.01em',
+              whiteSpace: 'nowrap',
+            }} className="hide-mobile">
+              {user?.name?.split(' ')[0] || 'User'}
+            </span>
           </button>
 
+          {/* Dropdown */}
           {showUserMenu && (
-            <div className="absolute right-0 top-full mt-2 w-48 rounded-xl overflow-hidden animate-slide-in z-50"
-              style={{ background: '#071020', border: '1px solid rgba(57,231,95,0.15)', boxShadow: '0 16px 48px rgba(0,0,0,0.5)' }}>
-              <div className="p-3" style={{ borderBottom: '1px solid rgba(57,231,95,0.08)' }}>
-                <div style={{ fontFamily: 'Rajdhani', fontWeight: 600, fontSize: '0.8rem', color: '#e2e8f0' }}>{user?.name}</div>
-                <div style={{ fontFamily: 'JetBrains Mono', fontSize: '0.6rem', color: '#334155', marginTop: '2px' }}>{user?.email}</div>
+            <div
+              className="animate-fade-in"
+              style={{
+                position: 'absolute', right: 0, top: 'calc(100% + 8px)',
+                width: 220, borderRadius: 14, overflow: 'hidden',
+                background: 'rgba(255,255,255,0.97)',
+                border: '1px solid var(--border)',
+                boxShadow: 'var(--shadow-lg)',
+                zIndex: 50,
+              }}
+            >
+              {/* User info header */}
+              <div style={{
+                padding: '12px 14px',
+                borderBottom: '1px solid var(--border)',
+                background: 'var(--surface)',
+              }}>
+                <div style={{ fontWeight: 600, fontSize: '0.85rem', color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>
+                  {user?.name}
+                </div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--text-ghost)', marginTop: 2 }}>
+                  {user?.email}
+                </div>
               </div>
-              {[
-                { icon: User, label: 'Profile & Settings', action: () => { navigate('/profile'); setShowUserMenu(false) } },
-                { icon: Settings, label: 'ERP Integration', action: () => { navigate('/erp-integration'); setShowUserMenu(false) } },
-              ].map(item => (
-                <button key={item.label} onClick={item.action}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 transition-colors"
-                  style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#64748b', fontFamily: 'Rajdhani', fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.05em', textAlign: 'left' }}
-                  onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'rgba(57,231,95,0.06)'}
-                  onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}>
-                  <item.icon className="w-4 h-4" />
-                  {item.label}
-                </button>
-              ))}
-              <div style={{ borderTop: '1px solid rgba(57,231,95,0.08)' }}>
-                <button onClick={() => { logout(); setShowUserMenu(false) }}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 transition-colors"
-                  style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#ff6b8a', fontFamily: 'Rajdhani', fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.05em', textAlign: 'left' }}
-                  onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'rgba(255,45,85,0.06)'}
-                  onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}>
-                  <LogOut className="w-4 h-4" />
+
+              {/* Menu items */}
+              <div style={{ padding: '6px' }}>
+                {[
+                  { icon: User,     label: 'Profile & Settings', action: () => { navigate('/profile');         setShowUserMenu(false) } },
+                  { icon: Settings, label: 'ERP Integration',    action: () => { navigate('/erp-integration'); setShowUserMenu(false) } },
+                ].map(item => (
+                  <button
+                    key={item.label}
+                    onClick={item.action}
+                    style={{
+                      width: '100%', display: 'flex', alignItems: 'center', gap: 10,
+                      padding: '8px 10px', borderRadius: 8,
+                      background: 'transparent', border: 'none', cursor: 'pointer',
+                      fontSize: '0.84rem', fontWeight: 500,
+                      color: 'var(--text-secondary)', textAlign: 'left',
+                      transition: 'background 0.12s ease',
+                    }}
+                    onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'var(--surface)'}
+                    onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}
+                  >
+                    <item.icon style={{ width: 15, height: 15, color: 'var(--text-muted)', flexShrink: 0 }} />
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Logout */}
+              <div style={{ padding: '0 6px 6px', borderTop: '1px solid var(--border)', paddingTop: 6 }}>
+                <button
+                  onClick={() => { logout(); setShowUserMenu(false) }}
+                  style={{
+                    width: '100%', display: 'flex', alignItems: 'center', gap: 10,
+                    padding: '8px 10px', borderRadius: 8,
+                    background: 'transparent', border: 'none', cursor: 'pointer',
+                    fontSize: '0.84rem', fontWeight: 500,
+                    color: 'var(--red)', textAlign: 'left',
+                    transition: 'background 0.12s ease',
+                  }}
+                  onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = 'rgba(255,69,58,0.07)'}
+                  onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}
+                >
+                  <LogOut style={{ width: 15, height: 15, flexShrink: 0 }} />
                   Sign Out
                 </button>
               </div>
@@ -111,6 +228,6 @@ export default function TopBar() {
           )}
         </div>
       </div>
-    </div>
+    </header>
   )
 }

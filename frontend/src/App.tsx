@@ -36,7 +36,6 @@ export default function App() {
         <Route path="erp-integration" element={<ERPIntegrationPage />} />
         <Route path="kpi" element={<KPIPage />} />
         <Route path="onboarding" element={<OnboardingPage />} />
-
       </Route>
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
